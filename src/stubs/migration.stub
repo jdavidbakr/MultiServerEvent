@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class MultiServerEvent extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('multi_server_event', function(Blueprint $table)
+        {
+            $table->string('mutex',32)->primary();
+            $table->string('lock',32);
+            $table->timestamp('start');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('multi_server_event');
+    }
+}
