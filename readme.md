@@ -2,6 +2,8 @@
 
 This package extends Laravel's native Event class to include the ability to block events from occurring aross multiple servers, as would be the case if you have a laravel instance behind a load balancer in an auto-scaling situation.
 
+It uses a database table to track the currently running process, and each server generates a unique key to lock the command. In order to prevent a condition where a short-running command's lock doesn't last long enough, we are implementing a minimum 10 second break between the completion of the command and its next execution time, so if a command runs every minute but takes between 50 and 59 seconds to complete, the next command will be delayed one more minute.
+
 ## Installation
 
 

@@ -14,9 +14,11 @@ class MultiServerEvent extends Migration
     {
         Schema::create('multi_server_event', function(Blueprint $table)
         {
-            $table->string('mutex',32)->primary();
+            $table->increments('id');
+            $table->string('mutex',32)->unique();
             $table->string('lock',32);
             $table->timestamp('start');
+            $table->timestamp('complete')->nullable();
         });
     }
 
