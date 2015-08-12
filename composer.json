@@ -1,12 +1,24 @@
 {
     "name": "jdavidbakr/multi-server-event",
+    "type": "library",
     "description": "This package extends Laravel's native Command Event class to allow for managing events fired on the same system with multiple servers, preventing an event from firing more than once",
+    "keywords": [
+        "Scheduler",
+        "Laravel",
+        "Multi-Server",
+        "Load Balancing"
+    ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Jon Baker",
             "email": "me@jdavidbaker.com"
         }
     ],
+    "require": {
+        "php": ">=5.5.9",
+        "laravel/framework": "5.1.*"
+    },
     "autoload": {
         "psr-4": {
             "jdavidbakr\\MultiServerEvent\\": "src/"

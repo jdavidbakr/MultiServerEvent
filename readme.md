@@ -9,32 +9,20 @@ This package extends Laravel's native Event class to include the ability to bloc
 $ composer require jdavidbakr/multi-server-event
 ```
 
-The new event structure uses a database table to track which server is currently executing an event. You must create the database table using the provided migration.  We also will need to register our new "run" command.  To do this, add the following to the $commands array in \App\Console\Kernel.php:
+The new event structure uses a database table to track which server is currently executing an event. You must create the database table using the provided migration.  To do this, add the following to the $commands array in \App\Console\Kernel.php:
 
 ```
 \jdavidbakr\MultiServerEvent\Commands\MultiServerMigrationService::class,
-\jdavidbakr\MultiServerEvent\Commands\ScheduleRunCommand::class,
 ```
 
 then perform the migration
 
 ```
 php artisan make:migration:multi-server-event
+php artisan migrate
 ```
 
-Even though we've replaced our "run" command above, we still need to tell the Kernel to use our new class when executing our cron jobs.  In app\Console\Kernel.php, change the class we will use for the schedule:
-
-```
-replace:
-
-use Illuminate\Console\Scheduling\Schedule;
-
-with:
-
-use jdavidbakr\MultiServerEvent\Scheduling\Schedule;
-```
-
-Then, add the following function to override its default:
+Now we want to change the default schedule IoC to use this alternate one.  In app\Console\Kernel.php add the following function:
 
 ```
 /**
@@ -44,11 +32,11 @@ Then, add the following function to override its default:
  */
 protected function defineConsoleSchedule()
 {
-    $this->app->instance(
-        'jdavidbakr\MultiServerEvent\Scheduling\Schedule', $schedule = new Schedule
-    );
+		$this->app->instance(
+            'Illuminate\Console\Scheduling\Schedule', $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule
+        );
 
-    $this->schedule($schedule);
+        $this->schedule($schedule);
 }
 ```
 
