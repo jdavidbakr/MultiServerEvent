@@ -71,7 +71,7 @@ class Event extends NativeEvent {
 	 */
 	public function skipMultiserver()
 	{
-		$this->key = md5($this->mutexPath());
+		$this->key = md5($this->expression.$this->command);
 		// Delete any old completed runs that are more than 10 seconds ago
 		DB::connection($this->connection)
 			->delete('delete from `'.$this->lock_table.'` where `mutex` = ? and complete < now() - interval 10 second',
