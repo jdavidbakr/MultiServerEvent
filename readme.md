@@ -17,7 +17,7 @@ $ composer require jdavidbakr/multi-server-event
 
 The new event structure uses a database table to track which server is currently executing an event. You must create the database table using the provided migration.  To do this, add the following to the $commands array in \App\Console\Kernel.php:
 
-```
+```php
 \jdavidbakr\MultiServerEvent\Commands\MultiServerMigrationService::class,
 ```
 
@@ -30,7 +30,7 @@ php artisan migrate
 
 Now we want to change the default schedule IoC to use this alternate one.  In app\Console\Kernel.php add the following function:
 
-```
+```php
 /**
  * Define the application's command schedule.
  *
@@ -38,11 +38,11 @@ Now we want to change the default schedule IoC to use this alternate one.  In ap
  */
 protected function defineConsoleSchedule()
 {
-		$this->app->instance(
-            'Illuminate\Console\Scheduling\Schedule', $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule
-        );
+    $this->app->instance(
+        'Illuminate\Console\Scheduling\Schedule', $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule
+    );
 
-        $this->schedule($schedule);
+    $this->schedule($schedule);
 }
 ```
 
@@ -50,10 +50,10 @@ protected function defineConsoleSchedule()
 
 When composing your schedule, simply add "withoutOverlappingMultiServer()" to the command, i.e.
 
-```
+```php
 $schedule->command('inspire')
-		->daily()
-		->withoutOverlappingMultiServer();
+    ->daily()
+    ->withoutOverlappingMultiServer();
 ```
 
 This will prevent multiple servers from executing the same event at the same time.
