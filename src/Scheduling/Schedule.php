@@ -4,8 +4,8 @@ namespace jdavidbakr\MultiServerEvent\Scheduling;
 
 use Illuminate\Console\Scheduling\Schedule as NativeSchedule;
 
-class Schedule extends NativeSchedule {
-
+class Schedule extends NativeSchedule
+{
     /**
      * Add a new command event to the schedule.
      *
@@ -23,5 +23,4 @@ class Schedule extends NativeSchedule {
 
         return $event;
     }
-	
 }
