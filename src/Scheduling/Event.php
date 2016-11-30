@@ -2,6 +2,7 @@
 
 namespace jdavidbakr\MultiServerEvent\Scheduling;
 
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event as NativeEvent;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
@@ -19,13 +20,13 @@ class Event extends NativeEvent
      * @var string
      */
     protected $key;
-    
+
     /**
      * The database connection for the multi_server_event table.
      * @var string
      */
     public $connection = null;
-    
+
     /**
      * The name of the table that contains the process locks.
      * @var string
@@ -78,25 +79,31 @@ class Event extends NativeEvent
 
         // Delete any old completed runs that are more than 10 seconds ago
         DB::connection($this->connection)
-            ->delete(
-                'delete from `'.$this->lock_table.'` where `mutex` = ? and complete < now() - interval 10 second',
-                [$this->key]
-            );
+            ->table($this->lock_table)
+            ->where('mutex', $this->key)
+            ->where('complete', '<', Carbon::now()->subSeconds(10))
+            ->delete();
 
         // Attempt to acquire the lock
-        DB::connection($this->connection)
-            ->insert(
-                'insert ignore into `'.$this->lock_table.'` set `mutex` = ?, `lock` = ?, `start` = now()',
-                [$this->key, $this->server_id]
-            );
+        try {
+            DB::connection($this->connection)
+                ->table($this->lock_table)
+                ->insert([
+                    'mutex' => $this->key,
+                    'lock'  => $this->server_id,
+                    'start' => Carbon::now()
+                ]);
+        } catch (\PDOException $e) {
+            // Catch the PDOException to fail silently because the query builder does not support INSERT IGNORE
+        }
 
         // If the mutex already exists in the table, the above query will fail silently.
         // Now we will perform a select to see if we got the lock or not.
         $lock = DB::connection($this->connection)
-            ->select(
-                'select `lock` from `'.$this->lock_table.'` where mutex = ?',
-                [$this->key]
-            );
+            ->table($this->lock_table)
+            ->where('mutex', $this->key)
+            ->select('lock')
+            ->get();
 
         if ($lock[0]->lock == $this->server_id) {
             // We got the lock
@@ -109,17 +116,17 @@ class Event extends NativeEvent
 
     /**
      * Delete our locks.
-     * @return void 
+     * @return void
      */
     public function clearMultiserver()
     {
         // Clear the lock
         if ($this->server_id) {
             DB::connection($this->connection)
-                ->update(
-                    'update `'.$this->lock_table.'` set complete = now() where `mutex` = ? and `lock` = ?',
-                    [$this->key, $this->server_id]
-                );
+                ->table($this->lock_table)
+                ->where('mutex', $this->key)
+                ->where('lock', $this->server_id)
+                ->update(['complete' => Carbon::now()]);
         }
     }
 }
