@@ -8,6 +8,12 @@ This package extends Laravel's native Event class to include the ability to bloc
 
 It uses a database table to track the currently running process, and each server generates a unique key to lock the command. In order to prevent a condition where a short-running command's lock doesn't last long enough, we are implementing a minimum 10 second break between the completion of the command and its next execution time, so if a command runs every minute but takes between 50 and 59 seconds to complete, the next command will be delayed one more minute.
 
+#### For Laravel < 5.4, please use version 1.X
+
+#### Upgrading from version 1.X
+
+If upgrading from version 1.X, please note the change in the defineConsoleSchedule() command in app\Console\Kernel.php.
+
 ## Installation
 
 
@@ -38,8 +44,9 @@ Now we want to change the default schedule IoC to use this alternate one.  In ap
  */
 protected function defineConsoleSchedule()
 {
-    $this->app->instance(
-        'Illuminate\Console\Scheduling\Schedule', $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule
+        $this->app->instance(
+            Schedule::class, $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule($this->app[\Illuminate\Contracts\Cache\Repository::class])
+        );
     );
 
     $this->schedule($schedule);

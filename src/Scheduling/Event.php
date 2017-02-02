@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event as NativeEvent;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event extends NativeEvent
 {
@@ -39,22 +40,13 @@ class Event extends NativeEvent
      * @param  string  $command
      * @return void
      */
-    public function __construct($command)
+    public function __construct(Cache $cache, $command)
     {
-        parent::__construct($command);
+        parent::__construct($cache, $command);
         $this->server_id = str_random(32);
-    }
-
-    /**
-     * Run the given event, then clear our lock.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
-     */
-    public function run(Container $container)
-    {
-        parent::run($container);
-        $this->clearMultiserver();
+        $this->then(function() {
+            $this->clearMultiserver();
+        });
     }
 
     /**

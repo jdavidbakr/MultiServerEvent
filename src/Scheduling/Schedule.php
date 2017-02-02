@@ -19,7 +19,7 @@ class Schedule extends NativeSchedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($command);
+        $this->events[] = $event = new Event(app()->make(\Illuminate\Contracts\Cache\Repository::class), $command);
 
         return $event;
     }
