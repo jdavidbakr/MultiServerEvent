@@ -76,6 +76,7 @@ class Event extends NativeEvent
             ->delete();
 
         // Attempt to acquire the lock
+        $gotLock = true;
         try {
             DB::connection($this->connection)
                 ->table($this->lock_table)
@@ -86,23 +87,10 @@ class Event extends NativeEvent
                 ]);
         } catch (\PDOException $e) {
             // Catch the PDOException to fail silently because the query builder does not support INSERT IGNORE
+            $gotLock = false;
         }
 
-        // If the mutex already exists in the table, the above query will fail silently.
-        // Now we will perform a select to see if we got the lock or not.
-        $lock = DB::connection($this->connection)
-            ->table($this->lock_table)
-            ->where('mutex', $this->key)
-            ->select('lock')
-            ->get();
-
-        if ($lock[0]->lock == $this->server_id) {
-            // We got the lock
-            return false;
-        }
-
-        // Someone else has the lock
-        return true;
+        return $gotLock === false;
     }
 
     /**
