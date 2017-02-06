@@ -43,18 +43,9 @@ class Event extends NativeEvent
     {
         parent::__construct($command);
         $this->server_id = str_random(32);
-    }
-
-    /**
-     * Run the given event, then clear our lock.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
-     */
-    public function run(Container $container)
-    {
-        parent::run($container);
-        $this->clearMultiserver();
+        $this->then(function() {
+            $this->clearMultiserver();
+        });
     }
 
     /**
