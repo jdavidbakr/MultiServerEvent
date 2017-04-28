@@ -64,6 +64,12 @@ $schedule->command('inspire')
 
 This will prevent multiple servers from executing the same event at the same time.
 
+## Testing
+
+```
+phpunit
+```
+
 [ico-version]: https://img.shields.io/packagist/v/jdavidbakr/multi-server-event.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/jdavidbakr/multi-server-event.svg?style=flat-square
