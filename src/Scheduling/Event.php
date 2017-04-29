@@ -3,10 +3,9 @@
 namespace jdavidbakr\MultiServerEvent\Scheduling;
 
 use Carbon\Carbon;
+use Illuminate\Console\Scheduling\CacheMutex;
 use Illuminate\Console\Scheduling\Event as NativeEvent;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event extends NativeEvent
 {
@@ -37,12 +36,13 @@ class Event extends NativeEvent
     /**
      * Create a new event instance.
      *
-     * @param  string  $command
-     * @return void
+     * @param CacheMutex $cacheMutex
+     * @param  string $command
+     * @throws \RuntimeException
      */
-    public function __construct(Cache $cache, $command)
+    public function __construct(CacheMutex $cacheMutex, $command)
     {
-        parent::__construct($cache, $command);
+        parent::__construct($cacheMutex, $command);
         $this->server_id = str_random(32);
         $this->then(function() {
             $this->clearMultiserver();

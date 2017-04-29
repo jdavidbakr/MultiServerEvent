@@ -2,6 +2,7 @@
 
 namespace jdavidbakr\MultiServerEvent\Scheduling;
 
+use Illuminate\Console\Scheduling\CacheMutex;
 use Illuminate\Console\Scheduling\Schedule as NativeSchedule;
 
 class Schedule extends NativeSchedule
@@ -19,7 +20,7 @@ class Schedule extends NativeSchedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event(app()->make(\Illuminate\Contracts\Cache\Repository::class), $command);
+        $this->events[] = $event = new Event(app()->make(CacheMutex::class), $command);
 
         return $event;
     }
