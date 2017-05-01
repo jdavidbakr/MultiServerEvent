@@ -45,7 +45,8 @@ Now we want to change the default schedule IoC to use this alternate one.  In ap
 protected function defineConsoleSchedule()
 {
     $this->app->instance(
-        Schedule::class, $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule($this->app[\Illuminate\Contracts\Cache\Repository::class])
+        Schedule::class,
+        $schedule = new \jdavidbakr\MultiServerEvent\Scheduling\Schedule()
     );
 
     $this->schedule($schedule);
