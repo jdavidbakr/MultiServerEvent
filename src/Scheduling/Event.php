@@ -56,7 +56,7 @@ class Event extends NativeEvent
      */
     public function withoutOverlappingMultiServer()
     {
-        return $this->skip(function () {
+        return $this->skip(function() {
             return $this->skipMultiserver();
         });
     }
@@ -67,13 +67,15 @@ class Event extends NativeEvent
      */
     public function skipMultiserver()
     {
-        $this->key = md5($this->expression.$this->command);
+        $this->key = md5($this->expression . $this->command);
 
         // Delete any old completed runs that are more than 10 seconds ago
+        $next = $this->nextRunDate();
         DB::connection($this->connection)
             ->table($this->lock_table)
             ->where('mutex', $this->key)
             ->where('complete', '<', Carbon::now()->subSeconds(10))
+            ->where('next', '<', $next)
             ->delete();
 
         // Attempt to acquire the lock
@@ -83,8 +85,9 @@ class Event extends NativeEvent
                 ->table($this->lock_table)
                 ->insert([
                     'mutex' => $this->key,
-                    'lock'  => $this->server_id,
-                    'start' => Carbon::now()
+                    'lock' => $this->server_id,
+                    'start' => Carbon::now(),
+                    'next' => $next,
                 ]);
         } catch (\PDOException $e) {
             // Catch the PDOException to fail silently because the query builder does not support INSERT IGNORE
