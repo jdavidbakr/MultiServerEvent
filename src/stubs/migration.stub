@@ -19,6 +19,7 @@ class MultiServerEvent extends Migration
             $table->string('lock',32);
             $table->timestamp('start');
             $table->timestamp('complete')->nullable();
+            $table->timestamp('next')->nullable();
         });
     }
 
