@@ -65,6 +65,17 @@ $schedule->command('inspire')
 
 This will prevent multiple servers from executing the same event at the same time.
 
+When composing your schedule, you can also ensure that cron is not stuck, simply add "ensureFinishedMultiServer()" to the command, i.e.
+
+```php
+$schedule->command('inspire')
+    ->daily()
+    ->withoutOverlappingMultiServer()
+    ->ensureFinishedMultiServer(30);
+```
+
+This will prevent from stuck commands during lost connection or deployment. Note, choose time to be enough to mark as "stuck", fox example, long running command should have bigger tolerance time.
+
 ## Testing
 
 ```
