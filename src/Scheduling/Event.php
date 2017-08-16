@@ -67,7 +67,7 @@ class Event extends NativeEvent
      */
     public function skipMultiserver()
     {
-        $this->key = md5($this->expression . $this->command);
+        $this->key = $this->getKey();
 
         // Delete any old completed runs that are more than 10 seconds ago
         $next = $this->nextRunDate();
@@ -95,6 +95,49 @@ class Event extends NativeEvent
         }
 
         return $gotLock === false;
+    }
+
+    /**
+     * @return string
+     */
+    private function getKey()
+    {
+        return md5($this->expression . $this->command);
+    }
+
+    /**
+     * Prevents this command to be dead forever when not succeeded to close cron session as it takes too long to be executing
+     * @param int $minutes
+     * @return $this
+     */
+    public function ensureFinishedMultiServer($minutes)
+    {
+        return $this->when(function() use ($minutes) {
+            return $this->ensureFinished($minutes);
+        });
+    }
+
+    /**
+     * Attempt to lock this command.
+     * @param int $minutes
+     * @return bool true if we want to skip
+     * @throws \RuntimeException
+     */
+    public function ensureFinished($minutes)
+    {
+        $this->key = $this->getKey();
+
+        // Finish any uncompleted command which runs for more than restricted minutes
+        $result = DB::connection($this->connection)
+            ->table($this->lock_table)
+            ->where('mutex', $this->key)
+            ->where('start', '<', Carbon::now()->subMinutes($minutes))
+            ->whereNull('complete')
+            ->update([
+                'complete' => Carbon::now(),
+            ]);
+
+        return $result;
     }
 
     /**
