@@ -119,7 +119,7 @@ class Event extends NativeEvent
     }
 
     /**
-     * Attempt to lock this command.
+     * Attempt to clean up this command.
      * @param int $minutes
      * @return bool true if we want to skip
      * @throws \RuntimeException
