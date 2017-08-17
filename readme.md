@@ -75,6 +75,7 @@ $schedule->command('inspire')
 ```
 
 This will prevent from stuck commands during lost connection or deployment. Note, choose time to be enough to mark as "stuck", fox example, long running command should have bigger tolerance time.
+You can track such events how ofter it happens by binding listeners on `EnsureCleanUpExecuted` event
 
 ## Testing
 
