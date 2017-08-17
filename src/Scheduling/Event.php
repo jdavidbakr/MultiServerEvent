@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Scheduling\CacheMutex;
 use Illuminate\Console\Scheduling\Event as NativeEvent;
 use Illuminate\Support\Facades\DB;
+use jdavidbakr\MultiServerEvent\Events\EnsureCleanUpExecuted;
 
 class Event extends NativeEvent
 {
@@ -133,9 +134,10 @@ class Event extends NativeEvent
             ->where('mutex', $this->key)
             ->where('start', '<', Carbon::now()->subMinutes($minutes))
             ->whereNull('complete')
-            ->update([
-                'complete' => Carbon::now(),
-            ]);
+            ->delete();
+        if ($result) {
+            event(new EnsureCleanUpExecuted($this->command));
+        }
 
         return true;
     }
