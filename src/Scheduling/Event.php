@@ -137,7 +137,7 @@ class Event extends NativeEvent
                 'complete' => Carbon::now(),
             ]);
 
-        return $result;
+        return true;
     }
 
     /**
