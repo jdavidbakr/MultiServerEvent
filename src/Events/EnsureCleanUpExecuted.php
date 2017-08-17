@@ -4,13 +4,20 @@ namespace jdavidbakr\MultiServerEvent\Events;
 
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Class EnsureCleanUpExecuted
+ * @package jdavidbakr\MultiServerEvent\Events
+ */
 class EnsureCleanUpExecuted
 {
     use SerializesModels;
+    /**
+     * @var string
+     */
     private $command;
 
     /**
-     * Deletion constructor.
+     * EnsureCleanUpExecuted constructor.
      * @param string $command
      */
     public function __construct($command)
